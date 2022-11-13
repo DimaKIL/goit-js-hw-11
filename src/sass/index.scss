@@ -1,0 +1,36 @@
+body {
+  background-color: aquamarine;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.photo-card {
+  display: flex;
+  flex-direction: column;
+  flex-basis: calc(100% / 5);
+  width: 350;
+  // height: 280;
+  margin: 5px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.info {
+  background-color: burlywood;
+  display: flex;
+  flex-grow: 1;
+  padding: 5px;
+}
