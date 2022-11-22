@@ -17,13 +17,15 @@ refs.gallery.addEventListener('click', e => {
 });
 
 let page = 1;
+let query = "";
 
-function onSubmit(e) {
-  e.preventDefault();
-  const val = refs.form.elements.searchQuery.value;
-  refs.gallery.innerHTML = '';
-  API.getData(val, page).then(data => {
-    page = 1;
+let previousY = 0;
+
+
+function loadPage(pageNumber, query) {
+  // Loads paginated data from API and appends it's rendered template into the gallery
+
+  API.getData(query, pageNumber).then(data => {
     if (data.data.hits.length === 0) {
       Notiflix.Notify.warning(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -37,24 +39,34 @@ function onSubmit(e) {
   });
 }
 
+function clearGallery() {
+  refs.gallery.innerHTML = '';
+}
+
+function onSubmit(e) {
+  // When new query is submitted
+  page = 1;
+  previousY = 0;
+
+  query = refs.form.elements.searchQuery.value;
+
+  e.preventDefault();
+  clearGallery();
+  loadPage(page, query);
+}
+
 let lightbox = new SimpleLightbox('.gallery a');
 
 const observer = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
+    const currentY = entry.boundingClientRect.y;
+    console.log(currentY);
+
+    if (currentY > previousY && entry.isIntersecting) {
+      loadPage(page, query);
       page += 1;
-      const val = refs.form.elements.searchQuery.value;
-      API.getData(val, page).then(data => {
-        if (data.data.hits.length === 0) {
-          Notiflix.Notify.warning(
-            "We're sorry, but you've reached the end of search results."
-          );
-          return;
-        }
-        makeMarkUp(data.data.hits, refs.gallery);
-        lightbox.refresh();
-        observer.observe(refs.gallery.lastElementChild);
-      });
     }
+
+    previousY = currentY;
   });
 });
